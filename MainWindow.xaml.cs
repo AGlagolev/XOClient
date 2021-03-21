@@ -17,11 +17,13 @@ using System.Windows.Shapes;
 
 namespace XOClient
 {
+    
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        private string _simbol = null;
         private bool _isConnected = false;
         private TcpClient _client;
         public MainWindow()
@@ -83,7 +85,7 @@ namespace XOClient
                     // Для этого надо организовать чтение в цикле как на сервере.
                     Int32 bytes = stream.Read(data, 0, data.Length);
                     responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
-                    MessageBox.Show(responseData);
+                    _simbol = responseData;
                     // Закрываем всё.
                     stream.Close();
                     client.Close();
@@ -127,14 +129,14 @@ namespace XOClient
 
         private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (((TextBlock)sender).Text == "X")
+            if (((TextBlock)sender).Text == _simbol)
             {
             ((TextBlock)sender).Text = "";
 
             }
             else
             {
-                ((TextBlock)sender).Text = "X";
+                ((TextBlock)sender).Text = _simbol;
             }
         }
     }
