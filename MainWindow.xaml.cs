@@ -49,25 +49,71 @@ namespace XOClient
                 string IP = textBox_IP.Text;
                 string PORT = textBox_PORT.Text;
                 string UserName = textBox_User.Text;
-
                 IPAddress address;
 
                 try
                 {
                     if (IPAddress.TryParse(IP, out address) && PORT.Length > 0)
                     {
-                        IPEndPoint iPEndPoint = new IPEndPoint(address, Convert.ToInt32(PORT));
-                        _client = new TcpClient();
-                        _client.Connect(iPEndPoint); /// подключение к удаленному серверу по сокету
-                        NetworkStream networkStream = _client.GetStream();
+                    // Создаём TcpClient.
+                    // Для созданного в предыдущем проекте TcpListener 
+                    // Настраиваем его на IP нашего сервера и тот же порт.
 
-                        //string userMessage = textBoxUserMessage.Text;
-                        byte[] byteArr = Encoding.Unicode.GetBytes("NewUser:" + UserName);
-                        networkStream.Write(byteArr, 0, byteArr.Length);
-                        //textBoxUserMessage.Text = "";
-                        //label_status.Content = "Message sended";
-                        _client.Close();
-                    }
+                    TcpClient client = new TcpClient(IP, Convert.ToInt32(PORT));
+
+                    // Переводим наше сообщение в ASCII, а затем в массив Byte.
+                    Byte[] data = System.Text.Encoding.ASCII.GetBytes("NewUser:" + UserName);
+
+                    // Получаем поток для чтения и записи данных.
+                    NetworkStream stream = client.GetStream();
+
+                    // Отправляем сообщение нашему серверу. 
+                    stream.Write(data, 0, data.Length);
+
+                    // Получаем ответ от сервера.
+
+                    // Буфер для хранения принятого массива bytes.
+                    data = new Byte[256];
+
+                    // Строка для хранения полученных ASCII данных.
+                    String responseData = String.Empty;
+
+                    // Читаем первый пакет ответа сервера. 
+                    // Можно читать всё сообщение.
+                    // Для этого надо организовать чтение в цикле как на сервере.
+                    Int32 bytes = stream.Read(data, 0, data.Length);
+                    responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
+                    MessageBox.Show(responseData);
+                    // Закрываем всё.
+                    stream.Close();
+                    client.Close();
+
+
+
+
+
+
+
+
+
+
+                    //    IPEndPoint iPEndPoint = new IPEndPoint(address, Convert.ToInt32(PORT));
+                    //    _client = new TcpClient();
+                    //    _client.Connect(iPEndPoint); /// подключение к удаленному серверу по сокету
+                    //    NetworkStream networkStream = _client.GetStream();
+
+                    //    byte[] byteArr = Encoding.Unicode.GetBytes("NewUser:" + UserName);
+                    //    networkStream.Write(byteArr, 0, byteArr.Length);
+
+                    /////// recive
+                    /////
+
+                    //byte[] data = new Byte[256];
+                    //Int32 bytes = networkStream.Read(data, 0, data.Length);
+                    //string responseData = System.Text.Encoding.Unicode.GetString(data, 0, bytes);
+                    //MessageBox.Show("Received: {0}", responseData);
+                    //_client.Close();
+                }
                 }
                 catch (SocketException socketEx)
                 {
